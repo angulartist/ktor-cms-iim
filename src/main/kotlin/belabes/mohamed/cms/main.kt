@@ -48,7 +48,7 @@ fun main() {
         //TODO: Peut etre, si jamais, on verra, BDD.
 
         install(Authentication) {
-            form("equal-auth") {
+            form("check-auth") {
                 userParamName = "username"
                 passwordParamName = "password"
                 challenge = FormAuthChallenge.Redirect { "/login" }
@@ -152,7 +152,7 @@ fun main() {
                 call.respond(FreeMarkerContent("auth/login.ftl", null, null))
             }
 
-            authenticate("equal-auth") {
+            authenticate("check-auth") {
                 post("/login") {
                     val principal = call.authentication.principal<UserIdPrincipal>()
                     call.sessions.set(AuthSession(principal!!.name))
