@@ -34,6 +34,43 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
         return articles
     }
 
+    override fun addArticle(title: String, text: String) {
+        pool.useConnection { connection ->
+            connection.prepareStatement("INSERT INTO articles (title, text) VALUES (?, ?)").use {stmt ->
+                stmt.setString(1, title)
+                stmt.setString(2, text)
+                stmt.execute()
+            }
+        }
+    }
+
+    override fun deleteArticle(id: Int) {
+        pool.useConnection { connection ->
+            connection.prepareStatement("DELETE FROM articles WHERE id = ?").use {stmt ->
+                stmt.setInt(1, id)
+                stmt.execute()
+            }
+        }
+    }
+
+    override fun deleteCommentsByArticle(id: Int) {
+        pool.useConnection { connection ->
+            connection.prepareStatement("DELETE FROM comments WHERE article_id = ?").use {stmt ->
+                stmt.setInt(1, id)
+                stmt.execute()
+            }
+        }
+    }
+
+    override fun deleteComment(id: Int) {
+        pool.useConnection { connection ->
+            connection.prepareStatement("DELETE FROM comments WHERE id = ?").use {stmt ->
+                stmt.setInt(1, id)
+                stmt.execute()
+            }
+        }
+    }
+
     override fun getArticle(id: Int): Article? {
         pool.useConnection { connection ->
             connection.prepareStatement("SELECT * FROM articles WHERE id = ?").use {stmt ->

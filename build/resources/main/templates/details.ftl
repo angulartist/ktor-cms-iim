@@ -6,8 +6,9 @@ Details:
 
 Comments:
 <form method="post">
+    <labe>Comment</labe>
     <textarea type="text" name="text" placeholder="Your comment..."></textarea>
-    <button type="submit">Post</button>
+    <button>Post</button>
 </form>
 <p>Lists:</p>:
 <ul>
