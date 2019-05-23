@@ -5,7 +5,7 @@ import belabes.mohamed.cms.model.Comment
 import belabes.mohamed.cms.model.User
 
 class MysqlModel(private val pool: ConnectionPool) : Model {
-    override fun postArticleComment(id: Int, text: String) {
+    override fun addComment(id: Int, text: String) {
         pool.useConnection { connection ->
             connection.prepareStatement("INSERT INTO comments (article_id, text) VALUES (?, ?)").use {stmt ->
                 stmt.setInt(1, id)

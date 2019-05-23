@@ -4,6 +4,7 @@ import belabes.mohamed.cms.admin.AdminArticleListPresenter
 import belabes.mohamed.cms.admin.AdminCallsPresenter
 import belabes.mohamed.cms.control.ArticleListPresenterImpl
 import belabes.mohamed.cms.control.ArticlePresenterImpl
+import belabes.mohamed.cms.control.CallsPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminArticleListPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminCallsPresenterImpl
 import belabes.mohamed.cms.services.AuthService
@@ -21,9 +22,15 @@ class AppComponents(mysqlUrl: String, mysqlUser: String, mysqlPassword: String) 
 
     fun getArticlePresenter(view: ArticlePresenter.View): ArticlePresenter = ArticlePresenterImpl(getModel(), view)
 
+    fun getCallsPresenter(view: CallsPresenter.View): CallsPresenter = CallsPresenterImpl(getModel(), view)
+
+    // ADMIN STUFF
+
     fun getAdminArticleListPresenter(view: AdminArticleListPresenter.View): AdminArticleListPresenter = AdminArticleListPresenterImpl(getModel(), view)
 
     fun getAdminCallsPresenter(view: AdminCallsPresenter.View): AdminCallsPresenter = AdminCallsPresenterImpl(getModel(), view)
+
+    // AUTH STUFF
 
     val authService = AuthService(getModel())
 }

@@ -19,7 +19,7 @@ interface Model {
 
     fun addArticle(title: String, text: String)
 
-    fun postArticleComment(id: Int, text: String)
+    fun addComment(id: Int, text: String)
 
     fun getUserByUsername(username: String): User?
 }

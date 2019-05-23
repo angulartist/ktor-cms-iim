@@ -2,6 +2,7 @@ package belabes.mohamed.cms
 
 import belabes.mohamed.cms.admin.AdminArticleListPresenter
 import belabes.mohamed.cms.admin.AdminCallsPresenter
+import belabes.mohamed.cms.model.AppSession
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
 import belabes.mohamed.cms.model.User
@@ -31,8 +32,6 @@ import kotlinx.coroutines.launch
 
 class App
 
-data class AuthSession(val user: String)
-
 fun main() {
     val component = AppComponents("jdbc:mysql://localhost:8889/CMS?serverTimezone=UTC", "root", "root")
 
@@ -43,7 +42,7 @@ fun main() {
         }
 
         install(Sessions) {
-            cookie<AuthSession>("AUTH_SESSION", SessionStorageMemory())
+            cookie<AppSession>("APP_SESSION_SSM", SessionStorageMemory())
         }
 
         install(Authentication) {
@@ -56,100 +55,95 @@ fun main() {
                     val authService = component.authService
                     val user: User? = authService.getUserByUsername(credentials.name)
 
-                    if (user == null) {
-                        null
-                    } else if ((credentials.name == user.username) && (credentials.password == user.password)) {
+                    if (user != null && (credentials.name == user.username) && (credentials.password == user.password)) {
                         UserIdPrincipal(credentials.name)
                     } else {
                         null
                     }
                 }
-                skipWhen { call -> call.sessions.get<AuthSession>() != null }
+                skipWhen { call -> call.sessions.get<AppSession>() != null }
             }
         }
 
         routing {
-            static ("static") {
+            static("static") {
                 resources("static")
             }
 
-
-            get("/article/{id}") {
-                val id = call.parameters["id"]?.toIntOrNull()
-
-                val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
-                    override fun displayArticle(article: Article, comments: List<Comment>) {
-                        val context = DetailsContext(article, comments)
-                        launch {
-                            call.respond(FreeMarkerContent("details.ftl", context, null))
+            get("/") {
+                val controller: ArticleListPresenter =
+                    component.getArticleListPresenter(object : ArticleListPresenter.View {
+                        override fun displayArticleList(list: List<Article>) {
+                            val context = IndexContext(list)
+                            launch {
+                                call.respond(FreeMarkerContent("index.ftl", context, null))
+                            }
                         }
-                    }
-
-                    override fun displayNotFound() {
-                        launch {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
-                    }
-
-                    override fun displayBadFormat() {
-                        launch {
-                            call.respond(FreeMarkerContent("errors/format.ftl", null, null))
-                        }
-                    }
-                })
-
-                if (id  == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    controller.start(id)
-                }
-            }
-
-            post("/article/{id}") {
-                val id = call.parameters["id"]?.toIntOrNull()
-                val postParameters: Parameters = call.receiveParameters()
-
-                val text: String? = postParameters["text"]
-
-                val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
-                    override fun displayArticle(article: Article, comments: List<Comment>) {
-                        val context = DetailsContext(article, comments)
-                        launch {
-                            call.respond(FreeMarkerContent("details.ftl", context, null))
-                        }
-                    }
-
-                    override fun displayNotFound() {
-                        launch {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
-                    }
-
-                    override fun displayBadFormat() {
-                        launch {
-                            call.respond(FreeMarkerContent("errors/format.ftl", null, null))
-                        }
-                    }
-                })
-
-                if (id == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    controller.postComment(id, text)
-                }
-            }
-
-            get ("/") {
-                val controller: ArticleListPresenter = component.getArticleListPresenter(object : ArticleListPresenter.View {
-                    override fun displayArticleList(list: List<Article>) {
-                        val context = IndexContext(list)
-                        launch {
-                            call.respond(FreeMarkerContent("index.ftl", context, null))
-                        }
-                    }
-                })
+                    })
 
                 controller.start()
+            }
+
+            // ARTICLES
+
+            route("article/{id}") {
+                get {
+                    val id = call.parameters["id"]?.toIntOrNull()
+
+                    val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
+                        override fun displayArticle(article: Article, comments: List<Comment>) {
+                            val context = DetailsContext(article, comments)
+                            launch {
+                                call.respond(FreeMarkerContent("details.ftl", context, null))
+                            }
+                        }
+
+                        override fun displayNotFound() {
+                            launch {
+                                call.respond(HttpStatusCode.NotFound)
+                            }
+                        }
+
+                        override fun displayBadFormat() {
+                            launch {
+                                call.respond(FreeMarkerContent("errors/format.ftl", null, null))
+                            }
+                        }
+                    })
+
+                    if (id == null) {
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        controller.start(id)
+                    }
+                }
+
+                post("/comment") {
+                    val id = call.parameters["id"]?.toIntOrNull()
+                    val postParameters: Parameters = call.receiveParameters()
+
+                    val text: String? = postParameters["text"]
+
+                    val controller = component.getCallsPresenter(object: CallsPresenter.View {
+                        override fun redirect() {
+                            launch {
+                                call.respondRedirect("/article/$id")
+                            }
+                        }
+
+                        override fun displayNotFound() {
+                            launch {
+                                call.respond(HttpStatusCode.NotFound)
+                            }
+                        }
+                    })
+
+                    if (id == null) {
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        controller.addComment(id, text)
+                    }
+                }
             }
 
             // ADMIN
@@ -160,20 +154,21 @@ fun main() {
             authenticate("check-auth") {
                 post("/login") {
                     val principal = call.authentication.principal<UserIdPrincipal>()
-                    call.sessions.set(AuthSession(principal!!.name))
+                    call.sessions.set(AppSession(principal!!.name))
                     call.respondRedirect("/admin/")
                 }
 
                 route("admin") {
                     get {
-                        val controller = component.getAdminArticleListPresenter(object : AdminArticleListPresenter.View {
-                            override fun displayArticleList(list: List<Article>) {
-                                val context = IndexContext(list)
-                                launch {
-                                    call.respond(FreeMarkerContent("admin/admin_index.ftl", context, null))
+                        val controller =
+                            component.getAdminArticleListPresenter(object : AdminArticleListPresenter.View {
+                                override fun displayArticleList(list: List<Article>) {
+                                    val context = IndexContext(list)
+                                    launch {
+                                        call.respond(FreeMarkerContent("admin/admin_index.ftl", context, null))
+                                    }
                                 }
-                            }
-                        })
+                            })
 
                         controller.start()
                     }
@@ -182,28 +177,29 @@ fun main() {
                         get("/{id}") {
                             val id = call.parameters["id"]?.toIntOrNull()
 
-                            val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
-                                override fun displayArticle(article: Article, comments: List<Comment>) {
-                                    val context = DetailsContext(article, comments)
-                                    launch {
-                                        call.respond(FreeMarkerContent("admin/admin_details.ftl", context, null))
+                            val controller: ArticlePresenter =
+                                component.getArticlePresenter(object : ArticlePresenter.View {
+                                    override fun displayArticle(article: Article, comments: List<Comment>) {
+                                        val context = DetailsContext(article, comments)
+                                        launch {
+                                            call.respond(FreeMarkerContent("admin/admin_details.ftl", context, null))
+                                        }
                                     }
-                                }
 
-                                override fun displayNotFound() {
-                                    launch {
-                                        call.respond(HttpStatusCode.NotFound)
+                                    override fun displayNotFound() {
+                                        launch {
+                                            call.respond(HttpStatusCode.NotFound)
+                                        }
                                     }
-                                }
 
-                                override fun displayBadFormat() {
-                                    launch {
-                                        call.respond(FreeMarkerContent("errors/format.ftl", null, null))
+                                    override fun displayBadFormat() {
+                                        launch {
+                                            call.respond(FreeMarkerContent("errors/format.ftl", null, null))
+                                        }
                                     }
-                                }
-                            })
+                                })
 
-                            if (id  == null) {
+                            if (id == null) {
                                 call.respond(HttpStatusCode.NotFound)
                             } else {
                                 controller.start(id)
@@ -213,59 +209,8 @@ fun main() {
                         get("delete/{id}") {
                             val id = call.parameters["id"]?.toIntOrNull()
 
-                            val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
-                                override fun redirect() {
-                                    launch {
-                                        call.respondRedirect("/admin/")
-                                    }
-                                }
-
-                                override fun displayNotFound() {
-                                    launch {
-                                        call.respond(HttpStatusCode.NotFound)
-                                    }
-                                }
-                            })
-
-                            if (id == null) {
-                                call.respond(HttpStatusCode.NotFound)
-                            } else {
-                                controller.deleteArticle(id)
-                            }
-                        }
-
-                        post("add") {
-                            val postParameters: Parameters = call.receiveParameters()
-
-                            val title: String? = postParameters["title"]
-                            val text: String? = postParameters["text"]
-
-                            val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
-                                override fun redirect() {
-                                    launch {
-                                        call.respondRedirect("/admin/")
-                                    }
-                                }
-
-                                override fun displayNotFound() {
-                                    launch {
-                                        call.respond(HttpStatusCode.NotFound)
-                                    }
-                                }
-                            })
-
-                            if (title == null || text == null) {
-                                call.respond(HttpStatusCode.NotFound)
-                            } else {
-                                controller.addArticle(title, text)
-                            }
-                        }
-
-                        route("comment") {
-                            get ("delete/{id}") {
-                                val id = call.parameters["id"]?.toIntOrNull()
-
-                                val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                            val controller: AdminCallsPresenter =
+                                component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
                                     override fun redirect() {
                                         launch {
                                             call.respondRedirect("/admin/")
@@ -279,6 +224,59 @@ fun main() {
                                     }
                                 })
 
+                            if (id == null) {
+                                call.respond(HttpStatusCode.NotFound)
+                            } else {
+                                controller.deleteArticle(id)
+                            }
+                        }
+
+                        post("add") {
+                            val postParameters: Parameters = call.receiveParameters()
+                            val title: String? = postParameters["title"]
+                            val text: String? = postParameters["text"]
+
+                            val controller: AdminCallsPresenter =
+                                component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                                    override fun redirect() {
+                                        launch {
+                                            call.respondRedirect("/admin/")
+                                        }
+                                    }
+
+                                    override fun displayNotFound() {
+                                        launch {
+                                            call.respond(HttpStatusCode.NotFound)
+                                        }
+                                    }
+                                })
+
+                            if (title == null || title.isEmpty() || text == null || text.isEmpty()) {
+                                call.respond(FreeMarkerContent("errors/format.ftl", null, null))
+                            } else {
+                                controller.addArticle(title, text)
+                            }
+                        }
+
+                        route("comment") {
+                            get("delete/{id}") {
+                                val id = call.parameters["id"]?.toIntOrNull()
+
+                                val controller: AdminCallsPresenter =
+                                    component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                                        override fun redirect() {
+                                            launch {
+                                                call.respondRedirect("/admin/")
+                                            }
+                                        }
+
+                                        override fun displayNotFound() {
+                                            launch {
+                                                call.respond(HttpStatusCode.NotFound)
+                                            }
+                                        }
+                                    })
+
                                 if (id == null) {
                                     call.respond(HttpStatusCode.NotFound)
                                 } else {
@@ -290,7 +288,7 @@ fun main() {
                 }
 
                 get("/logout") {
-                    call.sessions.clear<AuthSession>()
+                    call.sessions.clear<AppSession>()
                     call.respondRedirect("/")
                 }
             }

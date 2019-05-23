@@ -5,7 +5,7 @@ Details:
 <p>${article.text}</p>
 
 Comments:
-<form method="post">
+<form action="${article.id}/comment" method="post">
     <labe>Comment</labe>
     <textarea type="text" name="text" placeholder="Your comment..."></textarea>
     <button>Post</button>
