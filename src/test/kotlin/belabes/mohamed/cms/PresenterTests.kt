@@ -3,6 +3,7 @@ package belabes.mohamed.cms
 import belabes.mohamed.cms.control.ArticleListPresenterImpl
 import belabes.mohamed.cms.control.ArticlePresenterImpl
 import belabes.mohamed.cms.model.Article
+import belabes.mohamed.cms.model.Comment
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 
@@ -34,6 +35,12 @@ class PresenterTests {
     @Test
     fun testArticlePresenter() {
         val article = Article(1, "Toto", "Tata")
+        val comments: List<Comment> = listOf(
+            Comment(1, 1, "tototo"),
+            Comment(2, 1, "tototo"),
+            Comment(3, 1, "tototo"),
+            Comment(4, 1, "tototo")
+        )
 
         val model = mock<Model> {
             on { getArticle(1) } doReturn article
@@ -46,7 +53,7 @@ class PresenterTests {
         presenter.start(1)
 
         verify(model).getArticle(1)
-        verify(view).displayArticle(article)
+        verify(view).displayArticle(article, comments)
         verify(view, never()).displayNotFound()
         verifyNoMoreInteractions(model, view)
     }
