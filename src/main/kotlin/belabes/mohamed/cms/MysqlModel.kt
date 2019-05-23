@@ -2,6 +2,7 @@ package belabes.mohamed.cms
 
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
+import belabes.mohamed.cms.model.User
 
 class MysqlModel(private val pool: ConnectionPool) : Model {
     override fun postArticleComment(id: Int, text: String) {
@@ -108,5 +109,23 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
         }
 
         return comments
+    }
+
+    override fun getUserByUsername(username: String): User? {
+        pool.useConnection { connection ->
+            connection.prepareStatement("SELECT * FROM users WHERE username = ? AND isAdmin = 1").use {stmt ->
+                stmt.setString(1, username)
+                stmt.executeQuery().use {result ->
+                    if (result.next()) {
+                        return User(
+                            result.getInt("id"),
+                            result.getString("username"),
+                            result.getString("password")
+                        )
+                    }
+                }
+            }
+        }
+        return null
     }
 }

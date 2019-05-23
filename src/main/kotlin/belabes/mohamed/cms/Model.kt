@@ -2,6 +2,7 @@ package belabes.mohamed.cms
 
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
+import belabes.mohamed.cms.model.User
 
 interface Model {
     fun getArticles(): List<Article>
@@ -19,4 +20,6 @@ interface Model {
     fun addArticle(title: String, text: String)
 
     fun postArticleComment(id: Int, text: String)
+
+    fun getUserByUsername(username: String): User?
 }

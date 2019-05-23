@@ -4,6 +4,7 @@ import belabes.mohamed.cms.admin.AdminArticleListPresenter
 import belabes.mohamed.cms.admin.AdminCallsPresenter
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
+import belabes.mohamed.cms.model.User
 import belabes.mohamed.cms.tpl.DetailsContext
 import belabes.mohamed.cms.tpl.IndexContext
 import freemarker.cache.ClassTemplateLoader
@@ -45,15 +46,19 @@ fun main() {
             cookie<AuthSession>("AUTH_SESSION", SessionStorageMemory())
         }
 
-        //TODO: Peut etre, si jamais, on verra, BDD.
-
         install(Authentication) {
             form("check-auth") {
                 userParamName = "username"
                 passwordParamName = "password"
                 challenge = FormAuthChallenge.Redirect { "/login" }
+
                 validate { credentials ->
-                    if (credentials.name == credentials.password) {
+                    val authService = component.authService
+                    val user: User? = authService.getUserByUsername(credentials.name)
+
+                    if (user == null) {
+                        null
+                    } else if ((credentials.name == user.username) && (credentials.password == user.password)) {
                         UserIdPrincipal(credentials.name)
                     } else {
                         null
@@ -72,7 +77,7 @@ fun main() {
             get("/article/{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
 
-                var controller = component.getArticlePresenter(object : ArticlePresenter.View {
+                val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
                     override fun displayArticle(article: Article, comments: List<Comment>) {
                         val context = DetailsContext(article, comments)
                         launch {
@@ -106,7 +111,7 @@ fun main() {
 
                 val text: String? = postParameters["text"]
 
-                var controller = component.getArticlePresenter(object : ArticlePresenter.View {
+                val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
                     override fun displayArticle(article: Article, comments: List<Comment>) {
                         val context = DetailsContext(article, comments)
                         launch {
@@ -135,7 +140,7 @@ fun main() {
             }
 
             get ("/") {
-                var controller = component.getArticleListPresenter(object : ArticleListPresenter.View {
+                val controller: ArticleListPresenter = component.getArticleListPresenter(object : ArticleListPresenter.View {
                     override fun displayArticleList(list: List<Article>) {
                         val context = IndexContext(list)
                         launch {
@@ -161,7 +166,7 @@ fun main() {
 
                 route("admin") {
                     get {
-                        var controller = component.getAdminArticleListPresenter(object : AdminArticleListPresenter.View {
+                        val controller = component.getAdminArticleListPresenter(object : AdminArticleListPresenter.View {
                             override fun displayArticleList(list: List<Article>) {
                                 val context = IndexContext(list)
                                 launch {
@@ -177,7 +182,7 @@ fun main() {
                         get("/{id}") {
                             val id = call.parameters["id"]?.toIntOrNull()
 
-                            var controller = component.getArticlePresenter(object : ArticlePresenter.View {
+                            val controller: ArticlePresenter = component.getArticlePresenter(object : ArticlePresenter.View {
                                 override fun displayArticle(article: Article, comments: List<Comment>) {
                                     val context = DetailsContext(article, comments)
                                     launch {
@@ -208,7 +213,7 @@ fun main() {
                         get("delete/{id}") {
                             val id = call.parameters["id"]?.toIntOrNull()
 
-                            var controller = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                            val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
                                 override fun redirect() {
                                     launch {
                                         call.respondRedirect("/admin/")
@@ -235,7 +240,7 @@ fun main() {
                             val title: String? = postParameters["title"]
                             val text: String? = postParameters["text"]
 
-                            var controller = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                            val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
                                 override fun redirect() {
                                     launch {
                                         call.respondRedirect("/admin/")
@@ -260,7 +265,7 @@ fun main() {
                             get ("delete/{id}") {
                                 val id = call.parameters["id"]?.toIntOrNull()
 
-                                var controller = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
+                                val controller: AdminCallsPresenter = component.getAdminCallsPresenter(object : AdminCallsPresenter.View {
                                     override fun redirect() {
                                         launch {
                                             call.respondRedirect("/admin/")

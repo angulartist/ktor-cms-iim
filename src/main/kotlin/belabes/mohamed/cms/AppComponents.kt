@@ -6,6 +6,7 @@ import belabes.mohamed.cms.control.ArticleListPresenterImpl
 import belabes.mohamed.cms.control.ArticlePresenterImpl
 import belabes.mohamed.cms.control.admin.AdminArticleListPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminCallsPresenterImpl
+import belabes.mohamed.cms.services.AuthService
 
 class AppComponents(mysqlUrl: String, mysqlUser: String, mysqlPassword: String) {
     private val pool = ConnectionPool(mysqlUrl, mysqlUser, mysqlPassword)
@@ -24,4 +25,5 @@ class AppComponents(mysqlUrl: String, mysqlUser: String, mysqlPassword: String) 
 
     fun getAdminCallsPresenter(view: AdminCallsPresenter.View): AdminCallsPresenter = AdminCallsPresenterImpl(getModel(), view)
 
+    val authService = AuthService(getModel())
 }
