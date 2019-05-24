@@ -7,7 +7,7 @@ import belabes.mohamed.cms.model.User
 class MysqlModel(private val pool: ConnectionPool) : Model {
     override fun addComment(id: Int, text: String) {
         pool.useConnection { connection ->
-            connection.prepareStatement("INSERT INTO comments (article_id, text) VALUES (?, ?)").use {stmt ->
+            connection.prepareStatement("INSERT INTO comments (article_id, text) VALUES (?, ?)").use { stmt ->
                 stmt.setInt(1, id)
                 stmt.setString(2, text)
                 stmt.executeUpdate()
@@ -19,8 +19,8 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
         val articles = ArrayList<Article>()
 
         pool.useConnection { connection ->
-            connection.prepareStatement("SELECT * FROM articles").use {stmt ->
-                stmt.executeQuery().use {results ->
+            connection.prepareStatement("SELECT * FROM articles").use { stmt ->
+                stmt.executeQuery().use { results ->
                     while (results.next()) {
                         articles += Article(
                             results.getInt("id"),
@@ -37,7 +37,7 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun addArticle(title: String, text: String) {
         pool.useConnection { connection ->
-            connection.prepareStatement("INSERT INTO articles (title, text) VALUES (?, ?)").use {stmt ->
+            connection.prepareStatement("INSERT INTO articles (title, text) VALUES (?, ?)").use { stmt ->
                 stmt.setString(1, title)
                 stmt.setString(2, text)
                 stmt.execute()
@@ -47,7 +47,7 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun deleteArticle(id: Int) {
         pool.useConnection { connection ->
-            connection.prepareStatement("DELETE FROM articles WHERE id = ?").use {stmt ->
+            connection.prepareStatement("DELETE FROM articles WHERE id = ?").use { stmt ->
                 stmt.setInt(1, id)
                 stmt.execute()
             }
@@ -56,7 +56,7 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun deleteCommentsByArticle(id: Int) {
         pool.useConnection { connection ->
-            connection.prepareStatement("DELETE FROM comments WHERE article_id = ?").use {stmt ->
+            connection.prepareStatement("DELETE FROM comments WHERE article_id = ?").use { stmt ->
                 stmt.setInt(1, id)
                 stmt.execute()
             }
@@ -65,7 +65,7 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun deleteComment(id: Int) {
         pool.useConnection { connection ->
-            connection.prepareStatement("DELETE FROM comments WHERE id = ?").use {stmt ->
+            connection.prepareStatement("DELETE FROM comments WHERE id = ?").use { stmt ->
                 stmt.setInt(1, id)
                 stmt.execute()
             }
@@ -74,9 +74,9 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun getArticle(id: Int): Article? {
         pool.useConnection { connection ->
-            connection.prepareStatement("SELECT * FROM articles WHERE id = ?").use {stmt ->
+            connection.prepareStatement("SELECT * FROM articles WHERE id = ?").use { stmt ->
                 stmt.setInt(1, id)
-                stmt.executeQuery().use {result ->
+                stmt.executeQuery().use { result ->
                     if (result.next()) {
                         return Article(
                             result.getInt("id"),
@@ -88,17 +88,17 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
             }
         }
         return null
-   }
+    }
 
     override fun getArticleComments(id: Int): List<Comment> {
         val comments = ArrayList<Comment>()
 
         pool.useConnection { connection ->
-            connection.prepareStatement("SELECT * FROM comments WHERE article_id = ?").use {stmt ->
+            connection.prepareStatement("SELECT * FROM comments WHERE article_id = ?").use { stmt ->
                 stmt.setInt(1, id)
-                stmt.executeQuery().use {results ->
+                stmt.executeQuery().use { results ->
                     while (results.next()) {
-                        comments += Comment (
+                        comments += Comment(
                             results.getInt("id"),
                             results.getInt("article_id"),
                             results.getString("text")
@@ -113,9 +113,9 @@ class MysqlModel(private val pool: ConnectionPool) : Model {
 
     override fun getUserByUsername(username: String): User? {
         pool.useConnection { connection ->
-            connection.prepareStatement("SELECT * FROM users WHERE username = ? AND isAdmin = 1").use {stmt ->
+            connection.prepareStatement("SELECT * FROM users WHERE username = ? AND isAdmin = 1").use { stmt ->
                 stmt.setString(1, username)
-                stmt.executeQuery().use {result ->
+                stmt.executeQuery().use { result ->
                     if (result.next()) {
                         return User(
                             result.getInt("id"),

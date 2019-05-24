@@ -7,7 +7,7 @@ import belabes.mohamed.cms.model.Comment
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 
-class PresenterTests {
+class ArticlePresenterTests {
 
     @Test
     fun testArticleListPresenter(){
@@ -44,6 +44,7 @@ class PresenterTests {
 
         val model = mock<Model> {
             on { getArticle(1) } doReturn article
+            on { getArticleComments(1) } doReturn comments
         }
 
         val view = mock<ArticlePresenter.View>()
@@ -53,11 +54,14 @@ class PresenterTests {
         presenter.start(1)
 
         verify(model).getArticle(1)
+        verify(model).getArticleComments(1)
         verify(view).displayArticle(article, comments)
-        verify(view, never()).displayNotFound()
         verifyNoMoreInteractions(model, view)
     }
 
+    /**
+     * Tests if the right views are displayed if no article is found
+     */
     @Test
     fun testInvalidArticlePresenter() {
 

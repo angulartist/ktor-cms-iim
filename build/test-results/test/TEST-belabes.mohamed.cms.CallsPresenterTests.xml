@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="belabes.mohamed.cms.CallsPresenterTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2019-05-24T08:29:06" hostname="MacBook-Pro-de-TechLead.local" time="0.349">
+  <properties/>
+  <testcase name="testInvalidAddComment()" classname="belabes.mohamed.cms.CallsPresenterTests" time="0.347"/>
+  <testcase name="testAddComment()" classname="belabes.mohamed.cms.CallsPresenterTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
