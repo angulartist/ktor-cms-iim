@@ -1,4 +1,4 @@
-package belabes.mohamed.cms.admin
+package belabes.mohamed.cms.presenters.admin
 
 import belabes.mohamed.cms.model.Article
 

@@ -1,11 +1,14 @@
 package belabes.mohamed.cms
 
-import belabes.mohamed.cms.admin.AdminArticleListPresenter
-import belabes.mohamed.cms.admin.AdminCallsPresenter
+import belabes.mohamed.cms.presenters.admin.AdminArticleListPresenter
+import belabes.mohamed.cms.presenters.admin.AdminCallsPresenter
 import belabes.mohamed.cms.model.AppSession
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
 import belabes.mohamed.cms.model.User
+import belabes.mohamed.cms.presenters.ArticleListPresenter
+import belabes.mohamed.cms.presenters.ArticlePresenter
+import belabes.mohamed.cms.presenters.CallsPresenter
 import belabes.mohamed.cms.tpl.DetailsContext
 import belabes.mohamed.cms.tpl.IndexContext
 import freemarker.cache.ClassTemplateLoader

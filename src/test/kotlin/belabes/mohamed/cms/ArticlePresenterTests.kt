@@ -4,6 +4,8 @@ import belabes.mohamed.cms.control.ArticleListPresenterImpl
 import belabes.mohamed.cms.control.ArticlePresenterImpl
 import belabes.mohamed.cms.model.Article
 import belabes.mohamed.cms.model.Comment
+import belabes.mohamed.cms.presenters.ArticleListPresenter
+import belabes.mohamed.cms.presenters.ArticlePresenter
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 

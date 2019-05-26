@@ -1,8 +1,8 @@
 package belabes.mohamed.cms
 
-import belabes.mohamed.cms.admin.AdminArticleListPresenter
-import belabes.mohamed.cms.admin.AdminArticlePresenter
-import belabes.mohamed.cms.admin.AdminCallsPresenter
+import belabes.mohamed.cms.presenters.admin.AdminArticleListPresenter
+import belabes.mohamed.cms.presenters.admin.AdminArticlePresenter
+import belabes.mohamed.cms.presenters.admin.AdminCallsPresenter
 import belabes.mohamed.cms.control.admin.AdminArticleListPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminArticlePresenterImpl
 import belabes.mohamed.cms.control.admin.AdminCallsPresenterImpl

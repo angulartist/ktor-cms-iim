@@ -1,4 +1,4 @@
-package belabes.mohamed.cms.admin
+package belabes.mohamed.cms.presenters.admin
 
 interface AdminCallsPresenter {
     fun addArticle(title: String, text: String)

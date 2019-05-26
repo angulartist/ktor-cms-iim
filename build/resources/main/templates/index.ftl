@@ -30,10 +30,12 @@
 <div class="container">
     <div class="row">
         <div class="span12">
-            <marquee>
-                Welcome to the Beam blog. Learn the most important streaming systems notions such as windows, triggers, the
-                watermark, parallel transforms and so on!
-            </marquee>
+            <blink>
+                <marquee>
+                    Welcome to the Beam blog. Learn the most important streaming systems notions such as windows, triggers, the
+                    watermark, parallel transforms and so on!
+                </marquee>
+            </blink>
             <center>
                 <!-- TRIPLE MC HAMMER -->
                 <img src="http://code.divshot.com/geo-bootstrap/img/test/mchammer.gif">&nbsp;&nbsp;

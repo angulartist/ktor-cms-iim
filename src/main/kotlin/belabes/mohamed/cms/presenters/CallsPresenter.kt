@@ -1,4 +1,4 @@
-package belabes.mohamed.cms
+package belabes.mohamed.cms.presenters
 
 interface CallsPresenter {
     fun addComment(id: Int, text: String?)

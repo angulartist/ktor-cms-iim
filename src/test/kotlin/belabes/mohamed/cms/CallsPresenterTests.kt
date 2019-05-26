@@ -2,6 +2,7 @@ package belabes.mohamed.cms
 
 import belabes.mohamed.cms.control.CallsPresenterImpl
 import belabes.mohamed.cms.model.Comment
+import belabes.mohamed.cms.presenters.CallsPresenter
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions

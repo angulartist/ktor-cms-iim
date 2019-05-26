@@ -1,12 +1,15 @@
 package belabes.mohamed.cms
 
-import belabes.mohamed.cms.admin.AdminArticleListPresenter
-import belabes.mohamed.cms.admin.AdminCallsPresenter
+import belabes.mohamed.cms.presenters.admin.AdminArticleListPresenter
+import belabes.mohamed.cms.presenters.admin.AdminCallsPresenter
 import belabes.mohamed.cms.control.ArticleListPresenterImpl
 import belabes.mohamed.cms.control.ArticlePresenterImpl
 import belabes.mohamed.cms.control.CallsPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminArticleListPresenterImpl
 import belabes.mohamed.cms.control.admin.AdminCallsPresenterImpl
+import belabes.mohamed.cms.presenters.ArticleListPresenter
+import belabes.mohamed.cms.presenters.ArticlePresenter
+import belabes.mohamed.cms.presenters.CallsPresenter
 import belabes.mohamed.cms.services.AuthService
 
 class AppComponents(mysqlUrl: String, mysqlUser: String, mysqlPassword: String) {
